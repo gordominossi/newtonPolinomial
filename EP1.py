@@ -12,7 +12,7 @@ def firstFixedPoint(p, x0):
     while abs(np.polyval(p, x)) > EPSILON and n_iter < MAX_ITER:
         x = x - np.polyval(p, x) / np.polyval(dp, x)
         n_iter += 1
-    return raiz
+    return x
 
 # Calcula alguma raiz zl1 != NaN com o método de Newton
 # usando um número aleatório como aproximação inicial
@@ -25,17 +25,18 @@ def generalFixedPoint(p, q):
         # xk1 = xk - 1/(Dp/p - Dq/q)
         x = complex(np.random.rand(), np.random.rand())
         n_iter = 0
-        while abs(np.polyval(p, x)) > epsilon and n_iter < max_iter:
+        while abs(np.polyval(p, x)) > EPSILON and n_iter < MAX_ITER:
             print("x: ", x)
             # xk1 = xk - g(xk)
             x = x - 1/(np.polyval(dp, x)/np.polyval(p, x) - np.polyval(dq, x)/np.polyval(q, x))
             n_iter += 1
 
-        if n_iter > max_iter:
-             zli = np.nan
+        if n_iter > MAX_ITER:
+            zl1 = np.nan
         else:
             print("z: ", x)
-            zli = 1/x
+            zl1 = x
+    return zl1
 
 def polyzeros(a):
     p = np.poly1d(a)
@@ -43,39 +44,30 @@ def polyzeros(a):
     zeros = []
 
     # Calcula a aproximação da primeira raiz
-    raiz = firstFixedPoint(p, complex(np.random.rand(), np.random.rand())
+    raiz = firstFixedPoint(p, complex(np.random.rand(), np.random.rand()))
     zeros.append(raiz)
     q = np.poly1d(zeros, True)
 
     # Adiciona raizes ao vetor de zeros enquanto ele for menor que
     # a lista de coeficientes de a (que tem a - 1 raizes)
     while(len(zeros) < len(a) - 1):
-        # g = x - 1/(dp/p - dq/q)
-        g = x - 1/((dp/p)[0] - (dq/q)[0])
-
         # Calcula alguma raiz zl1 != NaN com o método de Newton
         # usando um número aleatório como aproximação inicial
-        zl1 = np.nan
-        while np.isnan(zl1):
-            # xk1 = xk - 1/(Dp/p - Dq/q)
-            x0 = complex(np.random.rand(), np.random.rand())
-            zl1 = fixed_point(p, g, x0)
+        zl1 = generalFixedPoint(p, q)
 
         # Calcula uma raiz com o método de Newton
         # usando zl1 como aproximação inicial
-        g = x - (p/dp)[0]
-        print("g: ", g)
-        zero = fixed_point(p, g, zl1)
+        zero = firstFixedPoint(p, zl1)
         print("zero: ", zero)
         zeros.append(zero)
         q = np.poly1d(zeros, True)
-        dq = np.polyder(q)
         print("q: ", q)
 
     return zeros
 
 def main():
 
-    print("zeros: ", polyzeros([1.5, 2, 3, 4, 8, -3, -6]))
+    #print("zeros: ", polyzeros([1.5, 2, 3, 4, 8, -3, -6]))
+    print("zeros: ", polyzeros([1, -2, -3]))
 
 main()
