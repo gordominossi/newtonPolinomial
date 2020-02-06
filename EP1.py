@@ -66,13 +66,13 @@ def polyzeros(a):
     return raizes
 
 def main():
-    f = open("entrada.txt", "r")
-    coeficientes = list(map(lambda c : complex(c), f.readline().strip().split(', ')))
+    coeficientes = list(map(lambda c : complex(c), input(
+        "Entre os coeficientes a de p(x) " + 
+        "da maior ordem para a menor ordem").split(', ')))
     global EPSILON
-    EPSILON = float(f.readline().strip())
+    EPSILON = float(input("Entre Epsilon: "))
     global MAX_ITER
-    MAX_ITER = int(f.readline().strip())
+    MAX_ITER = int(input("Entre o numero máximo de iterações: "))
 
-    print("zeros: ", polyzeros(coeficientes))
-    f.close()
+    print("raizes: ", polyzeros(coeficientes))
 main()
