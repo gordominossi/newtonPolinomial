@@ -1,7 +1,7 @@
 import numpy as np
 
-MAX_ITER = 20
-EPSILON = 1e-10
+MAX_ITER = 10
+EPSILON = 1e-8
 
 # Calcula uma raiz de um polinomio p usando o método de Newton
 # usando um número complexo x0 como aproximação inicial.
@@ -50,6 +50,7 @@ def NewtonComDeflação(p, q):
 
 def polyzeros(a):
     p = np.poly1d(a)
+    print(p)
     zeros = []
 
     # Calcula a aproximação da primeira raiz com o método de Newton
@@ -79,7 +80,13 @@ def polyzeros(a):
     return zeros
 
 def main():
+    f = open("entrada.txt", "r")
+    coeficientes = list(map(lambda c : complex(c), f.readline().strip().split(', ')))
+    global EPSILON
+    EPSILON = float(f.readline().strip())
+    global MAX_ITER
+    MAX_ITER = int(f.readline().strip())
 
-    print("zeros: ", polyzeros([1.5, 2, 3, 4, 8, -3, -6]))
-
+    print("zeros: ", polyzeros(coeficientes))
+    f.close()
 main()
