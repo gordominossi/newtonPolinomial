@@ -16,6 +16,7 @@ def pontoFixo(p, g, x0):
     else: 
         return x
 
+# Retorna o vetor de raizes do polinômio p(x) de coeficientes dados pelo vetor a
 def polyzeros(a):
     p = np.poly1d(a, 1)
     dp = np.polyder(p)
@@ -45,7 +46,7 @@ def polyzeros(a):
             x0 = complex(np.random.rand(), np.random.rand())
             
             # g(x) = p(x) / q(x)
-            g = lambda x : x - 1/(np.polyval(dp, x)/np.polyval(p, x) - np.polyval(dq, x)/np.polyval(q, x))
+            g = lambda x : x - 1 / (np.polyval(dp, x) / np.polyval(p, x) - np.polyval(dq, x) / np.polyval(q, x))
             zl1 = pontoFixo(p, g, x0)
 
         g = lambda x : x - np.polyval(p, x) / np.polyval(dp, x)
