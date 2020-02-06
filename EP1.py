@@ -22,7 +22,7 @@ def NewtonComAproximaçãoInicial(p, x0):
 
 # Calcula alguma raiz zl1 com o método de Newton
 # usando um número complexo aleatório como aproximação inicial.
-# Recebe um polinômio p(x) do qual se quer saber a raiz 
+# Recebe um polinômio p(x) do qual se quer saber a raiz
 # e um polinômio q(x) de fatores já encontrados do polinômio p(x).
 # Retorna uma raiz do polinômio deflacionado f(x) = p(x)/q(x)
 def NewtonComDeflação(p, q):
@@ -33,7 +33,7 @@ def NewtonComDeflação(p, q):
     while np.isnan(zl1):
         # x0 é um complexo aleatório de módulo entre 0 e 1
         x = complex(np.random.rand(), np.random.rand())
-        
+
         # Para se |p(x)| > EPSILON ou se n_iter >= MAX_ITER
         n_iter = 0
         while abs(np.polyval(p, x)) >= EPSILON and n_iter < MAX_ITER:
@@ -48,6 +48,8 @@ def NewtonComDeflação(p, q):
             zl1 = x
     return zl1
 
+# Retorna um vetor de aproximações do polinômio p(x)
+# Recebe o vetor dos coeficientes a do polinômio p(x)
 def polyzeros(a):
     p = np.poly1d(a)
     zeros = []
@@ -80,7 +82,7 @@ def polyzeros(a):
 
 def main():
     f = open("entrada.txt", "r")
-    coeficientes = list(map(lambda c : complex(c), f.readline().strip().split(', ')))
+    coeficientes = list(map(lambda c : complex(c), f.readline().strip("[]\n").split(', ')))
     global EPSILON
     EPSILON = float(f.readline().strip())
     global MAX_ITER
@@ -88,4 +90,5 @@ def main():
 
     print("zeros: ", polyzeros(coeficientes))
     f.close()
+
 main()
