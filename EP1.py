@@ -3,12 +3,15 @@ import numpy as np
 MAX_ITER = 10
 EPSILON = 1e-8
 
+# Calcula uma raiz do polinômio p(x) usando o Método do Ponto fixo para xk+1 = g(xk)
+# Recebe p(x), polinômio usado para determinar o critério de parada, g(x),
+# função para qual os sucessivos x's convergem e x0, uma aproximação inicial de x
+# Retorna uma arpoximação x para uma raiz de p(x)
 def pontoFixo(p, g, x0):
     x = x0
 
     n_iter = 0
     while abs(np.polyval(p, x)) > EPSILON and n_iter < MAX_ITER:
-        # xk+1 = g(xk)
         x = g(x)
         n_iter += 1
     if n_iter >= MAX_ITER:
@@ -46,7 +49,8 @@ def polyzeros(a):
             x0 = complex(np.random.rand(), np.random.rand())
             
             # g(x) = p(x) / q(x)
-            g = lambda x : x - 1 / (np.polyval(dp, x) / np.polyval(p, x) - np.polyval(dq, x) / np.polyval(q, x))
+            g = lambda x : x - 1 / (np.polyval(dp, x) / np.polyval(p, x) -
+                                    np.polyval(dq, x) / np.polyval(q, x))
             zl1 = pontoFixo(p, g, x0)
 
         g = lambda x : x - np.polyval(p, x) / np.polyval(dp, x)
