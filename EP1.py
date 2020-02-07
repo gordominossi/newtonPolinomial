@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 
 MAX_ITER = 10
@@ -19,6 +20,7 @@ def NewtonComAproximaçãoInicial(p, x0):
         x = x - np.polyval(p, x) / np.polyval(dp, x)
         n_iter += 1
     return x
+
 
 # Calcula alguma raiz zl1 com o método de Newton
 # usando um número complexo aleatório como aproximação inicial.
@@ -47,6 +49,7 @@ def NewtonComDeflação(p, q):
         else:
             zl1 = x
     return zl1
+
 
 # Retorna um vetor de aproximações do polinômio p(x)
 # Recebe o vetor dos coeficientes a do polinômio p(x)
@@ -80,15 +83,58 @@ def polyzeros(a):
 
     return zeros
 
+
+def parseStringsToComplexes(strings):
+    complexes = []
+    for string in strings:
+        complexes.append(complex(string))
+    return complexes
+
+
 def main():
-    f = open("entrada.txt", "r")
-    coeficientes = list(map(lambda c : complex(c), f.readline().strip("[]\n").split(', ')))
-    global EPSILON
-    EPSILON = float(f.readline().strip())
-    global MAX_ITER
-    MAX_ITER = int(f.readline().strip())
+
+    try:
+        f = open("entrada.txt", "r")
+    except:
+        print("Erro ao ler o arquivo de entrada.")
+        print("Certifique-se de que esteja no mesmo diretório e " +
+        "de que seja chamado entrada.txt")
+        print(sys.exc_info()[1], "aconteceu.")
+        return 1
+
+    try:
+        coeficientes = parseStringsToComplexes(f.readline().strip("[]\n").split(', '))
+    except:
+        print("Erro ao ler os coeficientes.")
+        print("Certifique-se de que estão no formato a + bj e " +
+        "de que estejam na primeira linha de entrada.txt")
+        print(sys.exc_info()[1], "aconteceu.")
+        f.close()
+        return 1
+    try:
+        global EPSILON
+        EPSILON = float(f.readline().strip())
+    except:
+        print("Erro ao ler os epsilon.")
+        print("Certifique-se de que seja um ponto flutuante e " +
+        "de que esteja na segunda linha de entrada.txt")
+        print(sys.exc_info()[1], "aconteceu.")
+        f.close()
+        return 1
+
+    try:
+        global MAX_ITER
+        MAX_ITER = int(f.readline().strip())
+    except:
+        print("Erro ao ler os epsilon.")
+        print("Certifique-se de que seja um inteiro e" +
+        "de que esteja na terceira linha de entrada.txt")
+        print(sys.exc_info()[1], "aconteceu.")
+        f.close()
+        return 1
 
     print("zeros: ", polyzeros(coeficientes))
     f.close()
+
 
 main()
