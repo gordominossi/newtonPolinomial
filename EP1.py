@@ -19,9 +19,10 @@ def pontoFixo(p, g, x0):
     else: 
         return x
 
+
 # Retorna o vetor de raizes do polinômio p(x) de coeficientes dados pelo vetor a
 def polyzeros(a):
-    p = np.poly1d(a, 1)
+    p = np.poly1d(a)
     dp = np.polyder(p)
 
     # g(x) = x - p(x) / dp(x)
@@ -38,9 +39,9 @@ def polyzeros(a):
     dq = np.polyder(q)
 
     # Encontra as outras raízes
-    # Adiciona raizes ao vetor de raizes enquanto ele for menor que
-    # a lista de coeficientes de a (que tem a - 1 raizes)
-    while(len(raizes) < len(a)):
+    # Adiciona raizes ao vetor de raizes [z1, ..., zn] enquanto ele for menor que
+    # a lista de coeficientes de a [a0, ..., an]
+    while(len(raizes) < len(a) - 1):
         
         # Encontrar uma raiz != NaN usando o método de Newton para o polinômio p(x)/q(x)
         zl1 = np.nan
@@ -64,6 +65,7 @@ def polyzeros(a):
         dq = np.polyder(q)
 
     return raizes
+
 
 def main():
     coeficientes = list(map(lambda c : complex(c), input(
