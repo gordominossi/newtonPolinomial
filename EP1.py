@@ -25,11 +25,10 @@ def NewtonComAproximaçãoInicial(p, x0):
 # Calcula alguma raiz zl1 com o método de Newton
 # usando um número complexo aleatório como aproximação inicial.
 # Recebe um polinômio p(x) do qual se quer saber a raiz
-# e um polinômio q(x) de fatores já encontrados do polinômio p(x).
-# Retorna uma raiz do polinômio deflacionado f(x) = p(x)/q(x)
-def NewtonComDeflação(p, q):
-    dp = np.polyder(p)
-    dq = np.polyder(q)
+# e um um vetor de zeros já encontrados do polinômio p(x).
+# Retorna uma raiz do polinômio deflacionado f(x) = p(x)/q(x), onde 
+# q(x) = polinômio dos fatores de p(x) determinados pelo vetor de zeros.
+def NewtonComDeflação(p, zeros):
     # Encontrar uma raiz != NaN
     zl1 = np.nan
     while np.isnan(zl1):
@@ -39,8 +38,13 @@ def NewtonComDeflação(p, q):
         # Para se |p(x)| > EPSILON ou se n_iter >= MAX_ITER
         n_iter = 0
         while abs(np.polyval(p, x)) >= EPSILON and n_iter < MAX_ITER:
+            # Calcula dq(x)/q(x)
+            dqq = 0
+            for zero in zeros:
+                dqq += 1 / np.polyval(np.poly1d([zero], True), x)
+
             # xk1 = xk - 1/(dp/p - dq/q)
-            x = x - 1/(np.polyval(dp, x)/np.polyval(p, x) - np.polyval(dq, x)/np.polyval(q, x))
+            x = x - 1/(np.polyval(dp, x)/np.polyval(p, x) - dqq)
             n_iter += 1
 
         # Se n_iter > MAX_ITER, ainda não achou uma raiz de f = p/q
@@ -59,27 +63,22 @@ def polyzeros(a):
 
     # Calcula a aproximação da primeira raiz com o método de Newton
     # usando um número complexo aleatório como aproximação inicial
-    raiz = NewtonComAproximaçãoInicial(p, complex(np.random.rand(), np.random.rand()))
-    zeros.append(raiz)
-
-    # q = polinômio de fatores do polinômio p encontrados até agora
-    q = np.poly1d(zeros, True)
+    zero = NewtonComAproximaçãoInicial(p, complex(np.random.rand(), np.random.rand()))
+    zeros.append(zero)
 
     # Encontra as outras raízes
     # Adiciona raizes ao vetor de zeros enquanto ele for menor que
     # a lista de coeficientes de a (que tem a - 1 raizes)
     while(len(zeros) < len(a) - 1):
         # Calcula alguma raiz zl1 != NaN com o método de Newton
-        # do polinômio deflacionado f(x) = p(x)/q(x)
-        zl1 = NewtonComDeflação(p, q)
+        # do polinômio deflacionado f(x) = p(x)/q(x), onde q(x) é
+        # o polinômio determinado pelos fatores de p(x) dados pelo vetor de zeros
+        zl1 = NewtonComDeflação(p, zeros)
 
         # Calcula uma raiz com o método de Newton
         # usando zl1 como aproximação inicial
         zero = NewtonComAproximaçãoInicial(p, zl1)
         zeros.append(zero)
-
-        # Recalcula o polinômio q(x) com a nova raiz encontrada
-        q = np.poly1d(zeros, True)
 
     return zeros
 
