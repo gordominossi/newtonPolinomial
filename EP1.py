@@ -1,5 +1,6 @@
 import sys
 import numpy as np
+import matplotlib.pyplot as plt
 
 MAX_ITER = 10
 EPSILON = 1e-8
@@ -29,7 +30,10 @@ def NewtonComAproximaçãoInicial(p, x0):
 # Retorna uma raiz do polinômio deflacionado f(x) = p(x)/q(x), onde 
 # q(x) = polinômio dos fatores de p(x) determinados pelo vetor de zeros.
 def NewtonComDeflação(p, zeros):
-    # Encontrar uma raiz != NaN
+    # dp(x), derivada do polinômio p(x)
+    dp = np.polyder(p)
+
+    # Encontra uma raiz != NaN
     zl1 = np.nan
     while np.isnan(zl1):
         # x0 é um complexo aleatório de módulo entre 0 e 1
@@ -82,7 +86,6 @@ def polyzeros(a):
 
     return zeros
 
-
 def parseStringsToComplexes(strings):
     complexes = []
     for string in strings:
@@ -110,6 +113,7 @@ def main():
         print(sys.exc_info()[1], "aconteceu.")
         f.close()
         return 1
+    
     try:
         global EPSILON
         EPSILON = float(f.readline().strip())
@@ -118,8 +122,6 @@ def main():
         print("Certifique-se de que seja um ponto flutuante e " +
         "de que esteja na segunda linha de entrada.txt")
         print(sys.exc_info()[1], "aconteceu.")
-        f.close()
-        return 1
 
     try:
         global MAX_ITER
@@ -129,11 +131,40 @@ def main():
         print("Certifique-se de que seja um inteiro e" +
         "de que esteja na terceira linha de entrada.txt")
         print(sys.exc_info()[1], "aconteceu.")
-        f.close()
-        return 1
 
-    print("zeros: ", polyzeros(coeficientes))
+    # Calcula os zeros do polinômio correspondente aos coeficientes
+    zeros = polyzeros(coeficientes)
+
+    # Plota os gráficos dos zeros encontrados
+    reais = []
+    imaginários = []
+    for zero in zeros:
+        reais.append(zero.real)
+        imaginários.append(zero.imag)
+    plt.plot(reais, imaginários, "r*")
+    plt.title(str(np.poly1d(coeficientes)), loc='left', family='monospace')
+    plt.xlabel("Eixo real", family='monospace')
+    plt.ylabel("Eixo imaginário", family='monospace')
+    plt.legend(["polyzeros(a)"])
+    plt.savefig("polyzeros(" + str(coeficientes) + ")")
+    plt.show()
+    
+    roots = np.roots(coeficientes)
+    reais = []
+    imaginários = []
+    for root in roots:
+        reais.append(root.real)
+        imaginários.append(root.imag)
+    plt.plot(reais, imaginários, "go")
+    plt.title(str(np.poly1d(coeficientes)), loc='left', family='monospace')
+    plt.xlabel("Eixo real", family='monospace')
+    plt.ylabel("Eixo imaginário", family='monospace')
+    plt.legend(["numpy.roots(a)"])
+    plt.savefig("numpy_roots(" + str(coeficientes) + ")")
+    plt.show()
+
+    print("polyzeros: ", zeros)
+    print("numpy.roots: ", roots)
     f.close()
-
 
 main()
