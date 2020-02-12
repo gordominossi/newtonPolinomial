@@ -17,7 +17,7 @@ def pontoFixo(p, g, x0):
         n_iter += 1
     if n_iter >= MAX_ITER:
         return np.nan
-    else: 
+    else:
         return x
 
 
@@ -28,15 +28,15 @@ def polyzeros(a):
 
     # g(x) = x - p(x) / dp(x)
     g = lambda x : x - np.polyval(p, x) / np.polyval(dp, x)
-    
+
     # Calcula a aproximação da primeira raiz com o método de Newton
     # usando um número complexo aleatório como aproximação inicial
     raiz = pontoFixo(p, g, complex(np.random.rand(), np.random.rand()))
     raizes = [raiz]
 
-    # q = polinômio de fatores do polinômio p encontrados até agora
-    q = np.poly1d(raizes, True)
-    dq = np.polyder(q)
+    # dqq = dq/q, divisão da derivada de q por
+    # q (polinômio de fatores do polinômio p encontrados até agora)
+    dqq = lambda x : 1 / np.polyval(np.poly1d([raiz], True), x)
 
     # Encontra as outras raízes
     # Adiciona raizes ao vetor de raizes [z1, ..., zn] enquanto ele for menor que
@@ -48,10 +48,9 @@ def polyzeros(a):
         while np.isnan(zl1):
             # x0 é um complexo aleatório de módulo entre 0 e 1
             x0 = complex(np.random.rand(), np.random.rand())
-            
+
             # g(x) = p(x) / q(x)
-            g = lambda x : x - 1 / (np.polyval(dp, x) / np.polyval(p, x) -
-                                    np.polyval(dq, x) / np.polyval(q, x))
+            g = lambda x : x - 1 / (np.polyval(dp, x) / np.polyval(p, x) - dqq(x))
             zl1 = pontoFixo(p, g, x0)
 
         g = lambda x : x - np.polyval(p, x) / np.polyval(dp, x)
@@ -60,9 +59,8 @@ def polyzeros(a):
         raiz = pontoFixo(p, g, zl1)
         raizes.append(raiz)
 
-        # Recalcula o polinômio q(x) com a nova raiz encontrada
-        q = np.poly1d(raizes, True)
-        dq = np.polyder(q)
+        # Recalcula dqq(x) com a nova raiz encontrada
+        dqq = lambda x : sum(list(map(lambda raiz : 1 / np.polyval(np.poly1d([raiz], True), x), raizes)))
 
     return raizes
 
@@ -83,8 +81,8 @@ def plot(raizes, formatação, nome, coeficientes):
 
 def main():
     coeficientes = list(map(lambda c : complex(c), input(
-        "Entre os coeficientes a de p(x) " + 
-        "da maior ordem para a menor ordem" + 
+        "Entre os coeficientes a de p(x) " +
+        "da maior ordem para a menor ordem " +
         "separados por ', ': ").split(', ')))
     global EPSILON
     EPSILON = float(input("Entre Epsilon: "))
@@ -93,7 +91,7 @@ def main():
 
     raizes = np.roots(coeficientes)
     plot(raizes, "rs", "numpy.roots", coeficientes)
-    
+
     raizes = polyzeros(coeficientes)
     plot(raizes, "g*", "polyzeros", coeficientes)
 
