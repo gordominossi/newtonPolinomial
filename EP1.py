@@ -15,10 +15,7 @@ def pontoFixo(p, g, x0):
     while abs(np.polyval(p, x)) > EPSILON and n_iter < MAX_ITER:
         x = g(x)
         n_iter += 1
-    if n_iter >= MAX_ITER:
-        return np.nan
-    else:
-        return x
+    return x
 
 
 # Retorna o vetor de raizes do polinômio p(x) de coeficientes dados pelo vetor a
@@ -34,32 +31,35 @@ def polyzeros(a):
     raiz = pontoFixo(p, g, complex(np.random.rand(), np.random.rand()))
     raizes = [raiz]
 
-    # dqq = dq/q, divisão da derivada de q por
-    # q (polinômio de fatores do polinômio p encontrados até agora)
+    # q(x) é o polinômio de fatores do polinômio p encontrados até agora
+    # dqq = q'(x) / q(x)
     dqq = lambda x : 1 / np.polyval(np.poly1d([raiz], True), x)
 
     # Encontra as outras raízes
     # Adiciona raizes ao vetor de raizes [z1, ..., zn] enquanto ele for menor que
     # a lista de coeficientes de a [a0, ..., an]
     while(len(raizes) < len(a) - 1):
+        # x0 é um complexo aleatório de módulo entre 0 e 1
+        x0 = complex(np.random.rand(), np.random.rand())
 
-        # Encontrar uma raiz != NaN usando o método de Newton para o polinômio p(x)/q(x)
-        zl1 = np.nan
-        while np.isnan(zl1):
-            # x0 é um complexo aleatório de módulo entre 0 e 1
-            x0 = complex(np.random.rand(), np.random.rand())
+        # f(x) = p(x) / q(x)
+        # g(x) = f(x) / f'(x)
+        g = lambda x : x - 1 / (np.polyval(dp, x) / np.polyval(p, x) - dqq(x))
+        # Encontra uma raiz usando o método de Newton para o polinômio p(x)/q(x)
+        zl1 = pontoFixo(p, g, x0)
 
-            # g(x) = p(x) / q(x)
-            g = lambda x : x - 1 / (np.polyval(dp, x) / np.polyval(p, x) - dqq(x))
-            zl1 = pontoFixo(p, g, x0)
-
+        # f(x) = p(x)
+        # g(x) = f(x) / f'(x)
         g = lambda x : x - np.polyval(p, x) / np.polyval(dp, x)
         # Calcula uma raiz com o método de Newton
         # usando zl1 como aproximação inicial
         raiz = pontoFixo(p, g, zl1)
         raizes.append(raiz)
 
-        # Recalcula dqq(x) com a nova raiz encontrada
+        # Recalcula dqq(x) com a nova raiz encontrada,
+        #############################################
+        ### FAVELA VAI COLOCAR A PROPRIEDADE AQUI ###
+        #############################################
         dqq = lambda x : sum(list(map(lambda raiz : 1 / np.polyval(np.poly1d([raiz], True), x), raizes)))
 
     return raizes
