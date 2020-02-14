@@ -17,6 +17,7 @@ def pontoFixo(p, g, x0):
         n_iter += 1
     return x
 
+
 # Método de Newton para um polinômio p(x)
 # Recebe p(x) e x0 e retorna uma raiz de p(x)
 def newtonClassico(p, x0):
@@ -48,7 +49,6 @@ def newtonPolinomial(p, raizes):
     return pontoFixo(p, g, x0)
 
 
-
 # Retorna o vetor de raizes do polinômio p(x) de coeficientes dados pelo vetor a
 def polyzeros(a):
     p = np.poly1d(a)
@@ -57,7 +57,6 @@ def polyzeros(a):
     # usando um número complexo aleatório como aproximação inicial
     raiz = newtonClassico(p, complex(np.random.rand(), np.random.rand()))
     raizes = [raiz]
-
 
     # Encontra as outras raízes
     # Adiciona raizes ao vetor de raizes [z1, ..., zn] enquanto ele for menor que
@@ -72,6 +71,13 @@ def polyzeros(a):
 
     return raizes
 
+
+# Plota as raizes dadas num plano complexo
+# Recebe o vetor de raízes, a formatação dos pontos a serem plotados,
+# o nome da função utilizada para gerar as raízes, que será a legenda do gráfico, 
+# assim como parte do nome do arquivo que será salvado e os coeficientes, 
+# que será parte de nome do arquivo e cujo polinômio será o título do gráfico plotado.
+# Não retorna nada
 def plot(raizes, formatação, nome, coeficientes):
 
     reais = list(map(lambda raiz : raiz.real, raizes))
@@ -87,6 +93,9 @@ def plot(raizes, formatação, nome, coeficientes):
     plt.savefig(nome + str(coeficientes) + ".png")
     plt.show()
 
+
+# Função principal.
+# Pega a entrada do usuário, define os parâmetros usados nas outras funções
 def main():
     coeficientes = list(map(lambda c : complex(c), input(
         "Entre os coeficientes a de p(x) " +
@@ -106,5 +115,6 @@ def main():
     plot(raizes, "g*", "polyzeros", coeficientes)
 
     print("raizes polyzeros: ", raizes)
+
 
 main()
