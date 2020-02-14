@@ -29,9 +29,9 @@ def newtonClassico(p, x0):
     return pontoFixo(p, g, x0)
 
 
-# Calcula usa o Método de Newton para a função f(x) = p(x) / q(x), em que 
-# q(x) é o polinốmio de fatores já encontrados de p(x) dado pelo vetor de raizes
-# Recebe o polinômio p(x), um vetor das raizes já encontradas e
+# Calcula usa o Método de Newton para a função f(x) = p(x) / q(x), em que
+# q(x) é o polinốmio de fatores já encontrados de p(x) dado pelo vetor de raízes
+# Recebe o polinômio p(x), um vetor das raízes já encontradas e
 # Retorna uma aproximação de uma raiz nova de p(x)
 def newtonPolinomial(p, raizes):
     dp = np.polyder(p)
@@ -49,7 +49,7 @@ def newtonPolinomial(p, raizes):
     return pontoFixo(p, g, x0)
 
 
-# Retorna o vetor de raizes do polinômio p(x) de coeficientes dados pelo vetor a
+# Retorna o vetor de raízes do polinômio p(x) de coeficientes dados pelo vetor a
 def polyzeros(a):
     p = np.poly1d(a)
 
@@ -59,7 +59,7 @@ def polyzeros(a):
     raizes = [raiz]
 
     # Encontra as outras raízes
-    # Adiciona raizes ao vetor de raizes [z1, ..., zn] enquanto ele for menor que
+    # Adiciona raízes ao vetor de raiíes [z1, ..., zn] enquanto ele for menor que
     # a lista de coeficientes de a [a0, ..., an]
     while(len(raizes) < len(a) - 1):
         # Encontra uma raiz usando o método de Newton para o polinômio p(x)/q(x)
@@ -72,10 +72,10 @@ def polyzeros(a):
     return raizes
 
 
-# Plota as raizes dadas num plano complexo
+# Plota as raízes dadas num plano complexo
 # Recebe o vetor de raízes, a formatação dos pontos a serem plotados,
-# o nome da função utilizada para gerar as raízes, que será a legenda do gráfico, 
-# assim como parte do nome do arquivo que será salvado e os coeficientes, 
+# o nome da função utilizada para gerar as raízes, que será a legenda do gráfico,
+# assim como parte do nome do arquivo que será salvado e os coeficientes,
 # que será parte de nome do arquivo e cujo polinômio será o título do gráfico plotado.
 # Não retorna nada
 def plot(raizes, formatação, nome, coeficientes):
@@ -94,6 +94,37 @@ def plot(raizes, formatação, nome, coeficientes):
     plt.show()
 
 
+# Gera um arquivo .csv com uma tabela de erros das raízes encontradas do polinômio p(x)
+# Recebe as raízes exatas, as raízes encontradas por polyzeros
+# e as raízes encontradas por numpy.roots
+def geraTabelaDeErros(raizesExatas, raizesPolyzeros, raizesNumpyRoots):
+
+    errosPolyzeros = list(map(lambda raizExata, raizPolyzero :
+        abs(raizExata - raizPolyzero), raizesExatas, raizesPolyzeros))
+    errosNumpyRoots = list(map(lambda raizExata, raizNumpyRoots :
+        abs(raizExata - raizNumpyRoots), raizesExatas, raizesNumpyRoots))
+
+    tabela = np.transpose([raizesExatas, raizesPolyzeros, errosPolyzeros, raizesNumpyRoots, errosNumpyRoots])
+
+    np.savetxt("tabelaDeErros.csv", tabela, delimiter = ", ")
+
+
+# Gera um arquivo .csv com uma tabela de resíduos das raízes encontradas do polinômio p(x)
+# Recebe os coeficientes do polinômio, as raízes encontradas por polyzeros
+# e as raízes encontradas por numpy.roots
+def geraTabelaDeResiduos(coeficientes, raizesPolyzeros, raizesNumpyRoots):
+    p = np.poly1d(coeficientes)
+
+    residuosPolyzeros = list(map(lambda raizPolyzero :
+        abs(np.polyval(p, raizPolyzero)), raizesPolyzeros))
+    residuosNumpyRoots = list(map(lambda raizNumpyRoots :
+        abs(np.polyval(p, raizNumpyRoots)), raizesNumpyRoots))
+
+    tabela = np.transpose([raizesPolyzeros, residuosPolyzeros, raizesNumpyRoots, residuosNumpyRoots])
+
+    np.savetxt("tabelaDeResiduos.csv", tabela, delimiter = ", ")
+
+
 # Função principal.
 # Pega a entrada do usuário, define os parâmetros usados nas outras funções
 def main():
@@ -106,15 +137,27 @@ def main():
     global MAX_ITER
     MAX_ITER = int(input("Entre o numero máximo de iterações: "))
 
-    raizes = np.roots(coeficientes)
-    plot(raizes, "rs", "numpy.roots", coeficientes)
+    try:
+        raizesExatas = list(map(lambda r : int(r), input(
+        "Entre as raízes exatas do polinômio separadas por ', '. " +
+        "(Deixe vazio se não souber as raízes exatas.): ").split(', ')))
+    except:
+        raizesExatas = []
 
-    print("raizes numpy.roots: ", raizes)
+    raizesNumpyRoots = np.roots(coeficientes)
+    plot(raizesNumpyRoots, "rs", "numpy.roots", coeficientes)
 
-    raizes = polyzeros(coeficientes)
-    plot(raizes, "g*", "polyzeros", coeficientes)
+    print("raízes numpy.roots: ", raizesNumpyRoots)
 
-    print("raizes polyzeros: ", raizes)
+    raizesPolyzeros = polyzeros(coeficientes)
+    plot(raizesPolyzeros, "g*", "polyzeros", coeficientes)
+
+    print("raízes polyzeros: ", raizesPolyzeros)
+
+    if raizesExatas:
+        geraTabelaDeErros(raizesExatas, raizesPolyzeros, raizesNumpyRoots)
+    else:
+        geraTabelaDeResiduos(coeficientes, raizesPolyzeros, raizesNumpyRoots)
 
 
 main()
