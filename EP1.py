@@ -2,8 +2,6 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 
-MAX_ITER = 10
-EPSILON = 1e-8
 
 # Calcula uma raiz de um polinomio p usando o método de Newton
 # usando um número complexo x0 como aproximação inicial.
@@ -145,23 +143,27 @@ def main():
         f.close()
         return 1
 
-    try:
         global EPSILON
+    try:
         EPSILON = float(f.readline().strip())
     except:
-        print("Erro ao ler os epsilon.")
+        print("Erro ao ler EPSILON.")
         print("Certifique-se de que seja um ponto flutuante e " +
         "de que esteja na segunda linha de entrada.txt")
         print(sys.exc_info()[1], "aconteceu.")
+        EPSILON = 1e-16
+        print("Usando EPSILON = 1e-16.")
 
-    try:
         global MAX_ITER
+    try:
         MAX_ITER = int(f.readline().strip())
     except:
-        print("Erro ao ler os epsilon.")
+        print("Erro ao ler MAX_ITER.")
         print("Certifique-se de que seja um inteiro e" +
-        "de que esteja na terceira linha de entrada.txt")
+        "de que esteja na terceira linha de entrada.txt.")
         print(sys.exc_info()[1], "aconteceu.")
+        MAX_ITER = 10
+        print("Usando MAX_ITER = 10.")
 
 
     try:
