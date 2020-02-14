@@ -27,7 +27,7 @@ def NewtonComAproximaçãoInicial(p, x0):
 # usando um número complexo aleatório como aproximação inicial.
 # Recebe um polinômio p(x) do qual se quer saber a raiz
 # e um um vetor de zeros já encontrados do polinômio p(x).
-# Retorna uma raiz do polinômio deflacionado f(x) = p(x)/q(x), onde 
+# Retorna uma raiz do polinômio deflacionado f(x) = p(x)/q(x), onde
 # q(x) = polinômio dos fatores de p(x) determinados pelo vetor de zeros.
 def NewtonComDeflação(p, zeros):
     # dp(x), derivada do polinômio p(x)
@@ -93,6 +93,37 @@ def parseStringsToComplexes(strings):
     return complexes
 
 
+# Gera um arquivo .csv com uma tabela de erros das raízes encontradas do polinômio p(x)
+# Recebe as raízes exatas, as raízes encontradas por polyzeros
+# e as raízes encontradas por numpy.roots
+def geraTabelaDeErros(raizesExatas, raizesPolyzeros, raizesNumpyRoots):
+
+    errosPolyzeros = list(map(lambda raizExata, raizPolyzero :
+        abs(raizExata - raizPolyzero), raizesExatas, raizesPolyzeros))
+    errosNumpyRoots = list(map(lambda raizExata, raizNumpyRoots :
+        abs(raizExata - raizNumpyRoots), raizesExatas, raizesNumpyRoots))
+
+    tabela = np.transpose([raizesExatas, raizesPolyzeros, errosPolyzeros, raizesNumpyRoots, errosNumpyRoots])
+
+    np.savetxt("tabelaDeErros.csv", tabela, delimiter = ", ")
+
+
+# Gera um arquivo .csv com uma tabela de resíduos das raízes encontradas do polinômio p(x)
+# Recebe os coeficientes do polinômio, as raízes encontradas por polyzeros
+# e as raízes encontradas por numpy.roots
+def geraTabelaDeResiduos(coeficientes, raizesPolyzeros, raizesNumpyRoots):
+    p = np.poly1d(coeficientes)
+
+    residuosPolyzeros = list(map(lambda raizPolyzero :
+        abs(np.polyval(p, raizPolyzero)), raizesPolyzeros))
+    residuosNumpyRoots = list(map(lambda raizNumpyRoots :
+        abs(np.polyval(p, raizNumpyRoots)), raizesNumpyRoots))
+
+    tabela = np.transpose([raizesPolyzeros, residuosPolyzeros, raizesNumpyRoots, residuosNumpyRoots])
+
+    np.savetxt("tabelaDeResiduos.csv", tabela, delimiter = ", ")
+
+
 def main():
 
     try:
@@ -113,7 +144,7 @@ def main():
         print(sys.exc_info()[1], "aconteceu.")
         f.close()
         return 1
-    
+
     try:
         global EPSILON
         EPSILON = float(f.readline().strip())
@@ -132,6 +163,12 @@ def main():
         "de que esteja na terceira linha de entrada.txt")
         print(sys.exc_info()[1], "aconteceu.")
 
+
+    try:
+        zerosExatos = parseStringsToComplexes(f.readline().strip("[]\n").split(', '))
+    except:
+        zerosExatos = []
+
     # Calcula os zeros do polinômio correspondente aos coeficientes
     zeros = polyzeros(coeficientes)
 
@@ -148,7 +185,7 @@ def main():
     plt.legend(["polyzeros(a)"])
     plt.savefig("polyzeros(" + str(coeficientes) + ")")
     plt.show()
-    
+
     roots = np.roots(coeficientes)
     reais = []
     imaginários = []
@@ -165,6 +202,13 @@ def main():
 
     print("polyzeros: ", zeros)
     print("numpy.roots: ", roots)
+
+    if zerosExatos:
+        geraTabelaDeErros(zerosExatos, zeros, roots)
+    else:
+        geraTabelaDeResiduos(coeficientes, zeros, roots)
+
     f.close()
+
 
 main()
